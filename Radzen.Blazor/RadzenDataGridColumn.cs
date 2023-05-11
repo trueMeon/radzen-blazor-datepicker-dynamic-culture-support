@@ -49,6 +49,18 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Gets the child columns.
+        /// </summary>
+        /// <value>The child columns.</value>
+        public IList<RadzenDataGridColumn<TItem>> ColumnsCollection
+        {
+            get
+            {
+                return Grid.childColumns.Where(c => c.Parent == this).ToList();
+            }
+        }
+
         internal int GetLevel()
         {
             int i = 0;
@@ -218,7 +230,10 @@ namespace Radzen.Blazor
             return _title ?? Title;
         }
 
-        internal void SetTitle(string value)
+        /// <summary>
+        /// Sets the column title.
+        /// </summary>
+        public void SetTitle(string value)
         {
             _title = value;
         }
@@ -560,17 +575,12 @@ namespace Radzen.Blazor
                 descriptor = new SortDescriptor() { Property = GetSortProperty() };
             }
 
-            if (GetSortOrder() == null)
+            if (order.HasValue)
             {
-                SetSortOrderInternal(Radzen.SortOrder.Ascending);
-                descriptor.SortOrder = Radzen.SortOrder.Ascending;
+                SetSortOrderInternal(order.Value);
+                descriptor.SortOrder = order.Value;
             }
-            else if (GetSortOrder() == Radzen.SortOrder.Ascending)
-            {
-                SetSortOrderInternal(Radzen.SortOrder.Descending);
-                descriptor.SortOrder = Radzen.SortOrder.Descending;
-            }
-            else if (GetSortOrder() == Radzen.SortOrder.Descending)
+            else
             {
                 SetSortOrderInternal(null);
                 if (Grid.sorts.Where(d => d.Property == GetSortProperty()).Any())
@@ -980,7 +990,10 @@ namespace Radzen.Blazor
             });
         }
 
-        internal string GetFilterOperatorText(FilterOperator filterOperator)
+        /// <summary>
+        /// Get filter operator text
+        /// </summary>
+        public string GetFilterOperatorText(FilterOperator filterOperator)
         {
             switch (filterOperator)
             {

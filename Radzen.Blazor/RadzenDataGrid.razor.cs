@@ -695,7 +695,10 @@ namespace Radzen.Blazor
         [Parameter]
         public PopupRenderMode FilterPopupRenderMode { get; set; } = PopupRenderMode.Initial;
 
-        internal async Task ClearFilter(RadzenDataGridColumn<TItem> column, bool closePopup = false)
+        /// <summary>
+        /// Сlear filter on the specified column
+        /// </summary>
+        public async Task ClearFilter(RadzenDataGridColumn<TItem> column, bool closePopup = false)
         {
             if (closePopup)
             {
@@ -727,13 +730,16 @@ namespace Radzen.Blazor
             await InvokeAsync(Reload);
         }
 
-        internal async Task ApplyFilter(RadzenDataGridColumn<TItem> column, bool closePopup = false)
+        /// <summary>
+        /// Apply filter to the specified column
+        /// </summary>
+        public async Task ApplyFilter(RadzenDataGridColumn<TItem> column, bool closePopup = false)
         {
             if (closePopup)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{PopupID}{column.GetFilterProperty()}");
             }
-            OnFilter(new ChangeEventArgs() { Value = column.GetFilterValue() }, column, true);
+            await OnFilter(new ChangeEventArgs() { Value = column.GetFilterValue() }, column, true);
         }
 
         internal IReadOnlyDictionary<string, object> CellAttributes(TItem item, RadzenDataGridColumn<TItem> column)
@@ -2703,13 +2709,9 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override async Task OnPageSizeChanged(int value)
         {
-            pageSize = value;
-
-            SaveSettings();
-
-            await PageSizeChanged.InvokeAsync(value);
-
             await base.OnPageSizeChanged(value);
+            await PageSizeChanged.InvokeAsync(value);
+            SaveSettings();
         }
 
         /// <summary>
@@ -2889,6 +2891,10 @@ namespace Radzen.Blazor
                 else if (type == typeof(double) || type == typeof(double?))
                 {
                     return element.GetDouble();
+                }
+                else if (type == typeof(float) || type == typeof(float?))
+                {
+                    return element.GetSingle();
                 }
                 else if (type == typeof(decimal) || type == typeof(decimal?))
                 {
